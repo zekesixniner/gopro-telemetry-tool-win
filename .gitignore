@@ -1,0 +1,10 @@
+node_modules/
+*.360
+*.mp4
+*.mov
+*.gpx
+*.kml
+*.geojson
+*.csv
+*.mgjson
+*.virb.gpx

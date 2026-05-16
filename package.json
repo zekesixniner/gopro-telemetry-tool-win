@@ -1,0 +1,14 @@
+{
+  "name": "gopro-telemetry-tool",
+  "version": "1.0.0",
+  "description": "Extract telemetry data from GoPro .360 files to multiple formats (GPX, KML, GeoJSON, CSV, MGJSON, VIRB)",
+  "main": "extract.js",
+  "scripts": {
+    "extract": "node extract.js"
+  },
+  "dependencies": {
+    "gpmf-extract": "latest",
+    "gopro-telemetry": "latest"
+  },
+  "license": "MIT"
+}
