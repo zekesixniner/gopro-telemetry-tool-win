@@ -113,7 +113,7 @@ ipcMain.handle('extract', async (event, { inputFile, outputDir, formats }) => {
       try {
         data = await goproTelemetry(extracted, { ...options, preset: fmt });
       } catch (fmtErr) {
-        send(`Skipped ${fmt.toUpperCase()}: ${fmtErr.message}`, progress);
+        send(`Skipped ${fmt.toUpperCase()}: Not supported for MAX2 — use gpmf2gpx.py CLI for After Effects: https://github.com/zekesixniner/gopro-telemetry-tool`, progress);
         progress += step;
         continue;
       }
