@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
+const { execFile } = require('child_process');
 const gpmfExtract = require('gpmf-extract');
 const goproTelemetry = require('gopro-telemetry');
 
@@ -38,27 +40,43 @@ ipcMain.handle('select-output', async () => {
   return result.filePaths[0] || null;
 });
 
+function getFFmpegPath() {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, 'ffmpeg.exe');
+  }
+  return path.join(__dirname, 'resources', 'ffmpeg.exe');
+}
+
+function extractGPMF(inputFile, tmpFile) {
+  return new Promise((resolve, reject) => {
+    const ffmpeg = getFFmpegPath();
+    execFile(ffmpeg, [
+      '-i', inputFile,
+      '-map', '0:3',
+      '-c', 'copy',
+      '-f', 'rawvideo',
+      '-y',
+      tmpFile
+    ], (err, stdout, stderr) => {
+      if (err) reject(new Error(`ffmpeg failed: ${stderr}`));
+      else resolve();
+    });
+  });
+}
+
 ipcMain.handle('extract', async (event, { inputFile, outputDir, formats }) => {
   const send = (msg, progress) =>
     event.sender.send('progress', { msg, progress });
 
+  const tmpFile = path.join(os.tmpdir(), `gpmf_${Date.now()}.bin`);
+
   try {
-    send('Reading file...', 5);
+    send('Extracting GPMF track with ffmpeg...', 5);
+    await extractGPMF(inputFile, tmpFile);
 
-    const extracted = await gpmfExtract(function(mp4boxFile) {
-      let offset = 0;
-      const stream = fs.createReadStream(inputFile, { highWaterMark: 4 * 1024 * 1024 });
-      stream.on('data', chunk => {
-        const ab = chunk.buffer.slice(chunk.byteOffset, chunk.byteOffset + chunk.byteLength);
-        ab.fileStart = offset;
-        offset += ab.byteLength;
-        mp4boxFile.appendBuffer(ab);
-      });
-      stream.on('end', () => mp4boxFile.flush());
-      stream.on('error', err => { throw err; });
-    });
-
-    send('Extracting GPMF data...', 20);
+    send('Parsing GPMF data...', 20);
+    const file = fs.readFileSync(tmpFile);
+    const extracted = await gpmfExtract(file);
 
     const baseName = path.basename(inputFile).replace(/\.[^.]+$/, '');
     const baseFile = path.join(outputDir, baseName);
@@ -102,5 +120,7 @@ ipcMain.handle('extract', async (event, { inputFile, outputDir, formats }) => {
   } catch (err) {
     send(`Error: ${err.message}`, 0);
     return { success: false, error: err.message };
+  } finally {
+    if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile);
   }
 });
