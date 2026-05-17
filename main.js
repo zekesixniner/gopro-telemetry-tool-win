@@ -54,7 +54,7 @@ function extractGPMF(inputFile, tmpFile) {
       '-i', inputFile,
       '-map', '0:3',
       '-c', 'copy',
-      '-f', 'rawvideo',
+      
       '-y',
       tmpFile
     ], (err, stdout, stderr) => {
@@ -68,7 +68,7 @@ ipcMain.handle('extract', async (event, { inputFile, outputDir, formats }) => {
   const send = (msg, progress) =>
     event.sender.send('progress', { msg, progress });
 
-  const tmpFile = path.join(os.tmpdir(), `gpmf_${Date.now()}.bin`);
+  const tmpFile = path.join(os.tmpdir(), `gpmf_${Date.now()}.mp4`);
 
   try {
     send('Extracting GPMF track with ffmpeg...', 5);
@@ -90,6 +90,7 @@ ipcMain.handle('extract', async (event, { inputFile, outputDir, formats }) => {
       GPSPrecision: 500,
       WrongSpeed: 120,
       smooth: 3,
+      videoFrameRate: 25,
     };
 
     const formatMap = {
@@ -108,7 +109,14 @@ ipcMain.handle('extract', async (event, { inputFile, outputDir, formats }) => {
     for (const fmt of selected) {
       send(`Generating ${fmt.toUpperCase()}...`, progress);
       const { ext, fix } = formatMap[fmt];
-      const data = await goproTelemetry(extracted, { ...options, preset: fmt });
+      let data;
+      try {
+        data = await goproTelemetry(extracted, { ...options, preset: fmt });
+      } catch (fmtErr) {
+        send(`Skipped ${fmt.toUpperCase()}: ${fmtErr.message}`, progress);
+        progress += step;
+        continue;
+      }
       const content = typeof data === 'string' ? fix(data) : fix(JSON.stringify(data, null, 2));
       fs.writeFileSync(`${baseFile}.${ext}`, content);
       progress += step;
