@@ -1,79 +1,63 @@
+# GoPro MAX2 Telemetry Tool
 
-
-# GoPro Telemetry Tool – Windows GUI
-
-A Windows desktop application for extracting GPS and telemetry data from **GoPro MAX2** `.360` files.
-
-This is a Windows GUI wrapper around the CLI tool [gopro-telemetry-tool](https://github.com/zekesixniner/gopro-telemetry-tool), which is based on [Juan Irache's gopro-telemetry](https://github.com/JuanIrache/gopro-telemetry).
-
----
+A Windows desktop app for extracting GPS and telemetry data from GoPro MAX2 `.360` files. Supports files of any size — tested with files up to 6GB.
 
 ## Download
 
-Go to [Releases](https://github.com/zekesixniner/gopro-telemetry-tool-win/releases) and download one of:
+👉 [Latest release (v1.0.7)](https://github.com/zekesixniner/gopro-telemetry-tool-win/releases/latest)
 
-| File | Description |
-|---|---|
-| `GoPro Telemetry Tool Setup 1.0.0.exe` | Installer (recommended) |
-| `GoPro Telemetry Tool-1.0.0-win.zip` | Portable – unzip and run, no installation needed |
+Download `GoPro.MAX2.Telemetry.Tool-x.x.x-win.zip`, extract, and run `GoPro MAX2 Telemetry Tool.exe` — no installation required.
 
-### ⚠️ Windows SmartScreen warning
+## Requirements
 
-When running the installer or the app for the first time, Windows may show a SmartScreen warning. This is expected for open source software without a paid code signing certificate.
+- Windows 10 or later (64-bit)
+- No additional software needed — ffmpeg is bundled
 
-To proceed safely:
-1. Click **"More info"**
-2. Click **"Run anyway"**
+## Usage
 
-The full source code is available on GitHub for inspection.
-
----
-
-## How to use
-
-1. Click **Browse** and select your `.360` file (or `.mp4` / `.mov`)
-2. Click **Browse** and select an output folder
-3. Select one or more output formats
+1. Click **Browse** next to *Input file* and select your `.360`, `.mp4` or `.mov` file
+2. Click **Browse** next to *Output folder* and select where to save the files
+3. Select one or more output formats (GPX is checked by default)
 4. Click **Extract Telemetry**
-
----
+5. When done, the output files appear in the selected folder
 
 ## Output formats
 
-| Format | Description |
-|---|---|
-| **GPX** | Standard GPS format – works with SkyDemon, Garmin, Google Earth and most mapping tools |
-| **KML** | Google Earth format with absolute altitude |
-| **GeoJSON** | For GIS applications and web maps |
-| **JSON** | All sensor streams in JSON format – contains the most data (see below) |
-| **MGJSON** | Adobe After Effects compatible format for motion data overlays |
-| **VIRB** | Garmin Virb compatible GPX with acceleration extension |
+| Format | Extension | Use case |
+|--------|-----------|----------|
+| GPX | `.gpx` | GPS Exchange — Google Maps, Garmin, most GPS apps |
+| KML | `.kml` | Google Earth (absolute altitude) |
+| GeoJSON | `.geojson` | GIS / web maps |
+| JSON | `.json` | All sensor streams — GPS, accelerometer, gyroscope, etc. |
+| VIRB | `.virb.gpx` | Garmin Virb Edit |
+| MGJSON | — | Not supported for MAX2 — see CLI below |
 
-### What is the JSON format?
+## Supported cameras
 
-The JSON file contains **all telemetry streams** recorded by the GoPro MAX2, not just GPS. This includes:
+- GoPro MAX2 (tested)
+- GoPro MAX, HERO9 and later (should work)
 
-| Stream | Description | Sample rate |
-|---|---|---|
-| GPS9 | Position, altitude, speed, accuracy | ~18 Hz |
-| ACCL | Accelerometer (x, y, z) | ~200 Hz |
-| GYRO | Gyroscope (x, y, z) – camera movement | ~400 Hz |
-| MAGN | Magnetometer / compass | ~25 Hz |
-| CORI | Camera orientation | per frame |
-| IORI | Image orientation | per frame |
-| GRAV | Gravity vector | per frame |
-| TMPC | Camera temperature | ~1 Hz |
-| SHUT | Shutter speed | per frame |
-| WBAL | White balance | per frame |
-| ISOE | ISO value | per frame |
+## After Effects / MGJSON
 
-### What is MGJSON?
+MGJSON export is not supported in the desktop app for GoPro MAX2 files due to missing frame rate data in the GPMF stream. Use the CLI script instead:
 
-MGJSON is a format used by **Adobe After Effects** to import motion and telemetry data. It allows you to link camera movement, GPS, and sensor data directly to your video timeline in After Effects.
+👉 [gpmf2gpx.py CLI](https://github.com/zekesixniner/gopro-telemetry-tool-win)
 
----
+## Building from source
 
-## Tested with
+Requires Node.js, WSL2/Ubuntu, and PowerShell on Windows 11.
 
-- GoPro MAX2, firmware H24.02.01.22.00
-- Windows 11
+```bash
+# WSL — bump version
+npm version patch
+git push
+
+# PowerShell — build
+npm run build
+```
+
+The build requires `resources/ffmpeg.exe` (Windows build of ffmpeg) to be present locally — it is excluded from git due to file size. Download from [ffmpeg.org](https://ffmpeg.org/download.html) or [BtbN/ffmpeg-builds](https://github.com/BtbN/ffmpeg-builds/releases).
+
+## License
+
+MIT
