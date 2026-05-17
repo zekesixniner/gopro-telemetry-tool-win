@@ -13,7 +13,7 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
     },
-    title: 'GoPro Telemetry Tool',
+    title: 'GoPro MAX2 Telemetry Tool',
   });
   win.loadFile('src/index.html');
   win.setMenuBarVisibility(false);
@@ -22,7 +22,6 @@ function createWindow() {
 app.whenReady().then(createWindow);
 app.on('window-all-closed', () => app.quit());
 
-// Filväljare för input
 ipcMain.handle('select-input', async () => {
   const result = await dialog.showOpenDialog({
     filters: [{ name: 'GoPro 360', extensions: ['360', 'mp4', 'mov'] }],
@@ -31,7 +30,6 @@ ipcMain.handle('select-input', async () => {
   return result.filePaths[0] || null;
 });
 
-// Mappväljare för output
 ipcMain.handle('select-output', async () => {
   const result = await dialog.showOpenDialog({
     properties: ['openDirectory', 'createDirectory'],
@@ -39,18 +37,27 @@ ipcMain.handle('select-output', async () => {
   return result.filePaths[0] || null;
 });
 
-// Extrahera telemetri
 ipcMain.handle('extract', async (event, { inputFile, outputDir, formats }) => {
   const send = (msg, progress) =>
     event.sender.send('progress', { msg, progress });
 
   try {
     send('Reading file...', 5);
-    const { size } = fs.statSync(inputFile);
-    const stream = fs.createReadStream(inputFile);
+
+    const extracted = await gpmfExtract(function(mp4boxFile) {
+      let offset = 0;
+      const stream = fs.createReadStream(inputFile, { highWaterMark: 4 * 1024 * 1024 });
+      stream.on('data', chunk => {
+        const ab = chunk.buffer.slice(chunk.byteOffset, chunk.byteOffset + chunk.byteLength);
+        ab.fileStart = offset;
+        offset += ab.byteLength;
+        mp4boxFile.appendBuffer(ab);
+      });
+      stream.on('end', () => mp4boxFile.flush());
+      stream.on('error', err => { throw err; });
+    });
 
     send('Extracting GPMF data...', 20);
-    const extracted = await gpmfExtract(stream, { useProgressiveMode: true, fileSize: size });
 
     const baseName = path.basename(inputFile).replace(/\.[^.]+$/, '');
     const baseFile = path.join(outputDir, baseName);
@@ -70,7 +77,7 @@ ipcMain.handle('extract', async (event, { inputFile, outputDir, formats }) => {
       gpx:     { ext: 'gpx',      fix: s => s },
       kml:     { ext: 'kml',      fix: s => s.replace(/clampToGround/g, 'absolute') },
       geojson: { ext: 'geojson',  fix: s => s },
-      csv:     { ext: 'json',      fix: s => s },
+      csv:     { ext: 'json',     fix: s => s },
       mgjson:  { ext: 'mgjson',   fix: s => s },
       virb:    { ext: 'virb.gpx', fix: s => s },
     };
