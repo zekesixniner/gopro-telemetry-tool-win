@@ -13,6 +13,20 @@ Download `GoPro.MAX2.Telemetry.Tool-x.x.x-win.zip`, extract, and run `GoPro MAX2
 - Windows 10 or later (64-bit)
 - No additional software needed — ffmpeg is bundled
 
+
+### ⚠️ Windows SmartScreen warning
+
+---
+When running the installer or the app for the first time, Windows may show a SmartScreen warning. This is expected for open source software without a paid code signing certificate.
+
+## Installation
+To proceed safely:
+1. Click **"More info"**
+2. Click **"Run anyway"**
+
+The full source code is available on GitHub for inspection.
+
+
 ## Usage
 
 1. Click **Browse** next to *Input file* and select your `.360`, `.mp4` or `.mov` file
