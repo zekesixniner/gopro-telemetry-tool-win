@@ -14,7 +14,7 @@ Download `GoPro.MAX2.Telemetry.Tool-x.x.x-win.zip`, extract, and run `GoPro MAX2
 - No additional software needed — ffmpeg is bundled
 
 
-### ⚠️ Windows SmartScreen warning
+## ⚠️ Windows SmartScreen warning
 
 When running the installer or the app for the first time, Windows may show a SmartScreen warning. This is expected for open source software without a paid code signing certificate.
 
