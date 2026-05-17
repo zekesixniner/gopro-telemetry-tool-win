@@ -1,0 +1,35 @@
+{
+  "name": "gopro-telemetry-tool",
+  "version": "1.0.1",
+  "description": "Extract telemetry data from GoPro .360 files to multiple formats",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron . --no-sandbox",
+    "build": "electron-builder --win"
+  },
+  "dependencies": {
+    "gopro-telemetry": "latest",
+    "gpmf-extract": "latest"
+  },
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "latest"
+  },
+  "build": {
+    "appId": "com.zekesixniner.gopro-telemetry-tool",
+    "productName": "GoPro MAX2 Telemetry Tool",
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "signAndEditExecutable": false,
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "license": "MIT"
+}
