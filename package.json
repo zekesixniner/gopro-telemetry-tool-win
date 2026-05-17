@@ -1,6 +1,6 @@
 {
   "name": "gopro-telemetry-tool",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Extract telemetry data from GoPro MAX2 .360 files to multiple formats",
   "main": "main.js",
   "scripts": {
