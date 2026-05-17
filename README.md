@@ -16,6 +16,7 @@ To proceed safely:
  
 1. Click **More info**
 2. Click **Run anyway**
+
 The full source code is available on GitHub for inspection.
  
 ## Requirements
