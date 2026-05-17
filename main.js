@@ -19,6 +19,7 @@ function createWindow() {
   win.setMenuBarVisibility(false);
 }
 
+app.commandLine.appendSwitch("js-flags", "--max-old-space-size=16384");
 app.whenReady().then(createWindow);
 app.on('window-all-closed', () => app.quit());
 

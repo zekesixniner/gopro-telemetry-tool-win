@@ -1,6 +1,6 @@
 {
   "name": "gopro-telemetry-tool",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Extract telemetry data from GoPro .360 files to multiple formats",
   "main": "main.js",
   "scripts": {
