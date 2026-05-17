@@ -1,4 +1,4 @@
-# GoPro MAX2 Telemetry Tool
+# GoPro MAX2 Telemetry GUI-Tool for Windows
 
 A Windows desktop app for extracting GPS and telemetry data from GoPro MAX2 `.360` files. Supports files of any size — tested with files up to 6GB.
 
