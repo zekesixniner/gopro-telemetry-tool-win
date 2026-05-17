@@ -9,3 +9,8 @@ node_modules/
 *.mgjson
 *.virb.gpx
 dist/
+extract.js
+gopro-telemetry-tool.zip
+icon.ico
+README.md_
+src/
